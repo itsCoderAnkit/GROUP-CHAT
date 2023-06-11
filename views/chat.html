@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <title>CHAT APP </title>
+</head>
+
+<body>
+
+    <div>
+        <h1 style="text-align: center"> USER CHATS </h1>
+
+    </div>
+    <div>
+        <button id="logoutId" type="submit" class="btn btn-primary">LOG OUT</button><br>
+        <!-- <a href="http://localhost:8000/password/forgotpassword" title="FORGOT PASSWORD"> FORGOT PASSWORD?</a> -->
+    </div>
+    <div class="container">
+        <ul id="chat">
+
+        </ul>
+
+    </div>
+    <div class="container">
+        <form id="sendmessage">
+
+            <div class="mb-3">
+                <label for="text" class="form-label">Message</label>
+                <input type="text" class="form-control" id="text" value="" name="text" aria-describedby="emailHelp">
+
+            </div>
+
+
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+
+    </div>
+
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+
+<script>
+
+    chat = document.getElementById('chat')
+    logoutButton = document.getElementById('logoutId')
+    message_form = document.getElementById('sendmessage')
+    message = document.getElementById('text')
+
+
+    //show_active_users()
+
+    async function show_active_users() {
+        let active_users = await axios.get("http://localhost:8000/user/getchats")
+        console.log(active_users.data.activeusers)
+        show_on_screen(active_users.data.activeusers)
+    }
+
+    async function show_on_screen(res_msg, res_user) {
+
+        try {
+            document.getElementById("chat").innerHTML = ''
+            //console.log("res>>>>",res)
+            for (let i = 0; i < res_msg.length; i++) {
+                
+                const parent_node_expense1 = document.getElementById("chat")
+                const childhtml = `<li id=${res_msg[i].id}> ${res_msg[i].message} </li>`
+                parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
+            }
+        }
+        catch {
+            console.log("UNABLE TO PRINT ON SCREEN")
+        }
+    }
+
+    //logout.addEventListener("click", logout)
+
+
+    logoutButton.onclick = logout
+    async function logout(e) {
+        try {
+            const token = localStorage.getItem('token')
+            console.log('dom token>>>>>>>>', token)
+            console.log("inside logout function")
+            let logout_user = await axios.get("http://localhost:8000/user/logout", { headers: { "Authorisation": token } })
+            console.log(logout_user)
+            if (logout_user.status == 200) {
+                window.location.href = "http://localhost:8000/user/login"
+            }
+            else {
+                throw new Error("FAILED TO LOGOUT")
+
+            }
+        }
+        catch {
+            console.log("UNABLE TO LOGOUT")
+        }
+
+    }
+
+    message_form.addEventListener('submit', save_message)
+
+    async function save_message(e) {
+        try {
+            e.preventDefault()
+            const token = localStorage.getItem('token')
+            console.log(message.value)
+            messageobj = {
+                newmessage: message.value
+            }
+
+            let save_message = await axios.post("http://localhost:8000/user/savechat", messageobj, { headers: { "Authorisation": token } })
+            console.log("save_messages>>", save_message)
+            message.value = ""
+        }
+        catch {
+            console.log("UNABLE TO SAVE MESSAGE IN DATABASE")
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", show_all_messages)
+
+
+    setInterval(() =>show_all_messages(), 1000)
+    async function show_all_messages() {
+        try {
+            const token = localStorage.getItem('token')
+            // 
+            let show_message_user = await axios.get("http://localhost:8000/user/showchat", { headers: { "Authorisation": token } })
+            console.log(show_message_user.data)
+
+            show_on_screen(show_message_user.data.all_messages, show_message_user.data.all_users)
+        }
+        catch {
+            console.log("UNABLE TO LOAD ALL MESSAGES")
+        }
+    }
+</script>
+
+</html>
