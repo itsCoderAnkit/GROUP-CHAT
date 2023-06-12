@@ -9,7 +9,7 @@ router.get('/user/getchats',chatController.user_getchats)
 
 router.post('/user/savechat', userauthentication.authenticate ,chatController.save_chat)
 
-router.get('/user/showchat',userauthentication.authenticate,chatController.get_all_chats)
+router.get('/user/showchat/:last_msg_id',userauthentication.authenticate,chatController.get_all_chats)
 
 
 module.exports = router

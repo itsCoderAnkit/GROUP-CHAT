@@ -2,6 +2,8 @@ const express = require('express')
 const path = require('path')
 const Users = require('../model/user_signup')
 const Message = require('../model/message')
+const sequelize = require('../util/database');
+const { Op } = require("sequelize");
 
 exports.user_chat = async (req, res, next) => {
     try {
@@ -46,11 +48,26 @@ exports.save_chat = async(req,res,next) =>{
 
 exports.get_all_chats = async (req,res,next)=>{
     try{
-        const all_messages = await Message.findAll()
-        const all_users = await Users.findAll()
+        console.log("param>>",req.params.last_msg_id)
+        console.log(typeof(+req.params.last_msg_id))
+        // const newnum = 4
+        // if(newnum === -1){
+        //     console.log("run")
+        //     //const all_messages = await Message.findAll()    
+        // }
+        // else if(newnum > -1){
+        //     console.log("i am running")
+            
+        //     const all_messages = await Message.findAll()
+            
+        // }
+         //const all_messages = await Message.findAll()
+         const all_messages = await Message.findAll({ where: { id: { [Op.gt]: req.params.last_msg_id }} });
+         
+         const all_users = await Users.findAll()
         
-        //console.log("all_messages>>>>>",all_messages)
-        //console.log("all_users>>>>>",all_users)
+        console.log("all_messages>---",all_messages)
+        console.log("all_users>>>>>",all_users)
         res.status(200).json({ all_messages: all_messages,all_users:all_users })
 
 
