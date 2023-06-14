@@ -9,6 +9,8 @@ router.get('/user/getchats',chatController.user_getchats)
 
 router.post('/user/savechat', userauthentication.authenticate ,chatController.save_chat)
 
+router.post('/user/savegroupchat/:groupId', userauthentication.authenticate ,chatController.save_group_chat)
+
 router.get('/user/showchat/:last_msg_id',userauthentication.authenticate,chatController.get_all_chats)
 
 

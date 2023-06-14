@@ -32,6 +32,7 @@ exports.save_chat = async(req,res,next) =>{
     try{
         console.log(req.body.newmessage)
         console.log(req.user.id)
+        
         const user_messages = await Message.create({
             message: req.body.newmessage,
             
@@ -46,10 +47,32 @@ exports.save_chat = async(req,res,next) =>{
     }
 }
 
+exports.save_group_chat = async(req,res,next) =>{
+    try{
+        console.log(req.body.newmessage)
+        console.log(req.user.id)
+        
+        groupId= req.params.groupId
+        console.log("groupId>>",req.params.groupId)
+        const user_group_messages = await Message.create({
+            message: req.body.newmessage,
+            
+            userId: req.user.id,
+            groupId:groupId
+        })
+        console.log("user_group_messaages>>",user_group_messages)
+        res.status(201).json({ user_messages: user_group_messages })
+    }
+    catch (err){
+        console.log(err)
+        console.log("CHAT NOT SAVE IN DB")
+    }
+}
+
 exports.get_all_chats = async (req,res,next)=>{
     try{
-        console.log("param>>",req.params.last_msg_id)
-        console.log(typeof(+req.params.last_msg_id))
+        //console.log("param>>",req.params.last_msg_id)
+        //console.log(typeof(+req.params.last_msg_id))
         // const newnum = 4
         // if(newnum === -1){
         //     console.log("run")
@@ -66,8 +89,8 @@ exports.get_all_chats = async (req,res,next)=>{
          
          const all_users = await Users.findAll()
         
-        console.log("all_messages>---",all_messages)
-        console.log("all_users>>>>>",all_users)
+        //console.log("all_messages>---",all_messages)
+        //console.log("all_users>>>>>",all_users)
         res.status(200).json({ all_messages: all_messages,all_users:all_users })
 
 

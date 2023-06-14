@@ -6,9 +6,13 @@ var cors = require('cors')
 
 const usersignup = require('./router/user.js')
 const userchats = require('./router/chat.js')
+const group = require('./router/group.js')
+const groupmessages = require('./router/groupmessages.js')
 
 const User = require('./model/user_signup.js')
 const Message = require('./model/message.js')
+const Group = require('./model/groups.js')
+const UserGroup = require('./model/usergroup.js')
 
 const dotenv = require('dotenv')
 
@@ -27,8 +31,16 @@ dotenv.config()
 User.hasMany(Message)
 Message.belongsTo(User)
 
+Group.hasMany(Message)
+Message.belongsTo(Group)
+
+User.belongsToMany(Group, { through: UserGroup });
+Group.belongsToMany(User, { through: UserGroup });
+
 app.use(usersignup)
 app.use(userchats)
+app.use(group)
+app.use(groupmessages)
 
 sequelize
 .sync()
