@@ -20,15 +20,17 @@ exports.get_new_group = async (req, res, next) => {
 exports.post_new_group = async (req, res, next) => {
     try {
         console.log(req.body)
-        //console.log("user>>",req.user.id)
+        console.log("user>>",req.user.name)
         const groupDetails = await Group.create({
+            adminname:req.user.name,
             groupname: req.body.groupName,
+            
 
         })
         const UserGroupDetails = await UserGroup.create({
             userId: req.user.id,
-            groupId: groupDetails.id
-
+            groupId: groupDetails.id,
+            isAdmin:true
 
         })
         return res.status(200).json({ success: true, message: "group created  successfully", groupDetails: groupDetails, UserGroupDetails: UserGroupDetails })

@@ -26,8 +26,13 @@
     }
 
     .right-column {
-      width: 25%;
+      background-color: rgb(226, 185, 131);
+      border: 5px solid #2b6b00;
+      border-radius: 5px;
+      width: 40%;
       float: right;
+      box-shadow: 20px 20px rgb(49, 83, 33);
+      height: 460px;
     }
 
     .chat-box {
@@ -72,21 +77,21 @@
       <div id="memberlist" style="padding-left: 4%; padding-right: 4%;"></div>
       <br>
       <h1>CHATS</h1>
-        <ul id="chat">
+      <ul id="chat">
 
 
-        </ul>
+      </ul>
       <form id="sendmessage">
 
         <div class="mb-3">
-            <label for="text" class="form-label">Message</label>
-            <input type="text" class="form-control" id="text" value="" name="text" aria-describedby="emailHelp">
+          <label for="text" class="form-label">Message</label>
+          <input type="text" class="form-control" id="text" value="" name="text" aria-describedby="emailHelp">
 
         </div>
 
 
         <button type="submit" class="btn btn-primary">Send</button>
-    </form>
+      </form>
     </div>
 
     <div class="right-column">
@@ -94,13 +99,24 @@
       <br>
       <div class="row" style="padding-left: 16%; padding-right: 16%;">
         <button class="btn btn-secondary btn-sm" id="group-link">Click to see group link</button>
-      </div>
-      <div id="group-link-down" style="visibility:hidden ;">
-        <h2> link of this group</h2>
-        <div id="real-link"></div>
+
+        <div id="group-link-down" style="visibility:hidden ;">
+          <h2> link of this group</h2>
+          <div id="real-link"></div>
+        </div>
       </div>
 
-  </div>
+      <div class="row" style="padding-left: 16%; padding-right: 16%;">
+        <button class="btn btn-secondary btn-sm" id="all-members">Click to see All group Members</button>
+
+        <div id="all-members-down" style="visibility:hidden ;">
+          <h2> All Members</h2>
+          <div id="new-admin"></div>
+          <div id="real-members"></div>
+          
+        </div>
+      </div>
+    </div>
 
     <button class="btn btn-danger" onclick="signOut()" style="position: fixed; bottom: 15px; right: 15px;">Log
       Out</button>
@@ -113,6 +129,7 @@
   message_form = document.getElementById('sendmessage')
   message = document.getElementById('text')
   group_link_button = document.getElementById("group-link")
+  all_members_button = document.getElementById("all-members")
 
   all_messages.addEventListener('click', load_group_messages)
 
@@ -120,82 +137,172 @@
     try {
       const token = localStorage.getItem('token')
       const groupId = localStorage.getItem('groupId')
-      console.log("groupIIIIDDDD >>.>>> ",groupId)
-      let get_group_message = await axios.get(`http://localhost:8000/getgroupchat/${groupId}`, { headers: { "Authorisation": token} },)
-            console.log("get_group_messages>>", get_group_message.data.groupMessages,get_group_message.data.groupMembers)
-            show_group_messages_screen(get_group_message.data.groupMessages,get_group_message.data.groupMembers)
+      console.log("groupIIIIDDDD >>.>>> ", groupId)
+      let get_group_message = await axios.get(`http://localhost:8000/getgroupchat/${groupId}`, { headers: { "Authorisation": token } },)
+      console.log("get_group_messages>>", get_group_message.data.groupMessages, get_group_message.data.groupMembers)
+      show_group_messages_screen(get_group_message.data.groupMessages, get_group_message.data.groupMembers)
     }
     catch (err) {
       console.log(err)
     }
   }
 
-  async function show_group_messages_screen(res_msg,res_user) {
+  async function show_group_messages_screen(res_msg, res_user) {
 
-try {
-    document.getElementById("chat").innerHTML = ''
-    console.log("res>>>>", res_msg)
-    for (let i = 0; i < res_msg.length; i++) {
+    try {
+      document.getElementById("chat").innerHTML = ''
+      console.log("res>>>>", res_msg)
+      for (let i = 0; i < res_msg.length; i++) {
         let userName = ""
         const parent_node_expense1 = document.getElementById("chat")
         for (let j = 0; j < res_user.length; j++) {
-            if (res_msg[i].userId === res_user[j].id) {
-                userName = res_user[j].name
-                break
-            }
-            else {
-                continue
-            }
+          if (res_msg[i].userId === res_user[j].id) {
+            userName = res_user[j].name
+            break
+          }
+          else {
+            continue
+          }
         }
         const childhtml = `<li id=${res_msg[i].id}> ${userName} -> ${res_msg[i].message} </li>`
         parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
-    }
+      }
 
-}
-catch (err) {
-    console.log(err)
-    console.log("UNABLE TO PRINT ON SCREEN")
-}
-}
+    }
+    catch (err) {
+      console.log(err)
+      console.log("UNABLE TO PRINT ON SCREEN")
+    }
+  }
 
   message_form.addEventListener('submit', save_message)
 
-    async function save_message(e) {
-        try {
-            e.preventDefault()
-            const token = localStorage.getItem('token')
-            const groupId = localStorage.getItem('groupId')
-            console.log(message.value)
-            messageobj = {
-                newmessage: message.value
-            }
+  async function save_message(e) {
+    try {
+      e.preventDefault()
+      const token = localStorage.getItem('token')
+      const groupId = localStorage.getItem('groupId')
+      console.log(message.value)
+      messageobj = {
+        newmessage: message.value
+      }
 
-            let save_message = await axios.post(`http://localhost:8000/user/savegroupchat/${groupId}`, messageobj, { headers: { "Authorisation": token} },)
-            console.log("save_messages>>", save_message)
-            message.value = ""
+      let save_message = await axios.post(`http://localhost:8000/user/savegroupchat/${groupId}`, messageobj, { headers: { "Authorisation": token } },)
+      console.log("save_messages>>", save_message)
+      message.value = ""
+    }
+    catch (err) {
+      console.log(err)
+      console.log("UNABLE TO SAVE MESSAGE IN DATABASE")
+    }
+  }
+
+  group_link_button.addEventListener('click', getlink)
+
+
+  async function getlink() {
+    groupId = localStorage.getItem('groupId')
+    document.getElementById("real-link").innerHTML = ''
+
+
+    const parent_node_expense1 = document.getElementById("real-link")
+
+    const childhtml = `<p id=${groupId}> http://localhost:8000/joingroup/${groupId} </p>`
+    parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
+
+    document.getElementById('group-link-down').style.visibility = "visible"
+    document.getElementById('group-link').style.visibility = "hidden"
+
+  }
+
+  all_members_button.addEventListener('click', getmembers)
+
+
+  async function getmembers() {
+    groupId = localStorage.getItem('groupId')
+    const token = localStorage.getItem('token')
+
+    let get_group_members = await axios.get(`http://localhost:8000/getgroupmembers/${groupId}`, { headers: { "Authorisation": token } },)
+
+    console.log("group members", get_group_members.data)
+
+    show_group_members_screen(get_group_members.data.groupMembers, get_group_members.data.isAdmin)
+  }
+
+
+  async function show_group_members_screen(res_user, isAdmin) {
+
+    try {
+      document.getElementById("real-members").innerHTML = ''
+      console.log("res>>>>", res_user)
+      for (let i = 0; i < res_user.length; i++) {
+        let userName = ""
+        if (isAdmin) {
+          const parent_node_expense1 = document.getElementById("real-members")
+
+          const childhtml = `<li id=${res_user[i].id}>  ${res_user[i].name} 
+      <button onclick=makeAdmin('${res_user[i].id}')> Make Admin </button>
+      <button onclick=removeUser('${res_user[i].id}')> Remove User </button></li>`
+          parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
         }
-        catch(err) {
-          console.log(err)
-            console.log("UNABLE TO SAVE MESSAGE IN DATABASE")
+        else {
+          const parent_node_expense1 = document.getElementById("real-members")
+
+          const childhtml = `<li id=${res_user[i].id}>  ${res_user[i].name} 
+      </li>`
+          parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
         }
+
+      }
+      document.getElementById('all-members-down').style.visibility = "visible"
+      document.getElementById('all-members').style.visibility = "hidden"
+
+    }
+    catch (err) {
+      console.log(err)
+      console.log("UNABLE TO PRINT ON SCREEN")
+    }
+  }
+
+  async function makeAdmin(userId) {
+    try {
+      console.log("new admin>>", userId)
+      groupId = localStorage.getItem('groupId')
+      const token = localStorage.getItem('token')
+      console.log("new admin>>", token)
+
+      let change_admin = await axios.post(`http://localhost:8000/changeAdmin/${groupId}/${userId}`, { headers: { "Authorisation": token } })
+      console.log(change_admin.data.admin_name)
+      document.getElementById('new-admin').innerHTML = document.getElementById('new-admin').innerHTML + `<div style="color:green">CONGRATULATION! ${change_admin.data.admin_name} IS NOW ADMIN </div>`
+
+    }
+    catch (err) {
+      console.log(err)
+      console.log("not changed admin frntnd")
+    }
+  }
+
+  async function removeUser(userId) {
+
+    try {
+      console.log("new admin>>", userId)
+      groupId = localStorage.getItem('groupId')
+      const token = localStorage.getItem('token')
+      console.log("new admin>>", token)
+
+      let remove_User = await axios.delete(`http://localhost:8000/removeUser/${groupId}/${userId}`, { headers: { "Authorisation": token } })
+      console.log(remove_User)
+
+
+    }
+    catch (err) {
+      console.log(err)
+      console.log("not changed admin frntnd")
     }
 
-    group_link_button.addEventListener('click',getlink)
 
 
-    async function getlink(){
-      groupId=localStorage.getItem('groupId')
-      document.getElementById("real-link").innerHTML = ''
-    
-    
-        const parent_node_expense1 = document.getElementById("real-link")
-        
-        const childhtml = `<p id=${groupId}> http://localhost:8000/joingroup/${groupId} </p>`
-        parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
-        
-        document.getElementById('group-link-down').style.visibility="visible"
-
-    }
+  }
 
 </script>
 

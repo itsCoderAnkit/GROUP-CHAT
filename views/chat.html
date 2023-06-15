@@ -213,10 +213,10 @@
     let all_new_LS_messages_array = []
     let all_LS_users_array = []
     //setInterval(() =>show_all_messages(), 1000)
-    let last_msg_id
+    let last_msg_id =-1
     async function show_all_messages() {
         try {
-            last_msg_id = localStorage.getItem('last_msg_id')
+            //last_msg_id = localStorage.getItem('last_msg_id')
             const token = localStorage.getItem('token')
 
             let show_message_user = await axios.get(`http://localhost:8000/user/showchat/${last_msg_id}`, { headers: { "Authorisation": token } })
@@ -229,27 +229,27 @@
 
             }
 
-            //console.log("new array", all_new_LS_messages_array)
+            console.log("new array", all_new_LS_messages_array)
 
             let retString_messages = localStorage.getItem("messages")
             let retArray_messages = JSON.parse(retString_messages)
-            if (retArray_messages) {
-                //console.log("It exist")
-                if (retArray_messages.length >= 10) {
-                    console.log("h")
-                    retArray_messages.shift()
-                }
-                all_LS_messages_array = retArray_messages.concat(all_new_LS_messages_array)
-            }
-            if (!retArray_messages) {
-                //console.log("IT DOESN'T EXIST")
-                all_LS_messages_array = all_new_LS_messages_array
-            }
+            // if (retArray_messages) {
+            //     //console.log("It exist")
+            //     if (retArray_messages.length >= 10) {
+            //         console.log("h")
+            //         retArray_messages.shift()
+            //     }
+            //     all_LS_messages_array = retArray_messages.concat(all_new_LS_messages_array)
+            // }
+            // if (!retArray_messages) {
+            //     //console.log("IT DOESN'T EXIST")
+            //     all_LS_messages_array = all_new_LS_messages_array
+            // }
             //console.log("retarray", retArray_messages)
 
             //console.log("tillu>>", all_LS_messages_array[0])
             //console.log(last_msg_id)
-            localStorage.setItem('last_msg_id', last_msg_id)
+            //localStorage.setItem('last_msg_id', last_msg_id)
 
             for (i = 0; i < show_message_user.data.all_users.length; i++) {
                 //console.log(show_message_user.data.all_messages[i])
@@ -261,21 +261,21 @@
 
             //console.log("all>>>", all_LS_users_array)
 
-            myobj_stringified_messages = JSON.stringify(all_LS_messages_array)
+            // myobj_stringified_messages = JSON.stringify(all_LS_messages_array)
             myobj_stringified_users = JSON.stringify(all_LS_users_array)
 
-            localStorage.setItem('messages', myobj_stringified_messages)
+            // localStorage.setItem('messages', myobj_stringified_messages)
             localStorage.setItem('users', myobj_stringified_users)
-            let final_retString_messages = localStorage.getItem("messages")
+            //let final_retString_messages = localStorage.getItem("messages")
 
             let retString_users = localStorage.getItem("users")
 
-            let final_retArray_messages = JSON.parse(final_retString_messages)
+            //let final_retArray_messages = JSON.parse(final_retString_messages)
             //console.log("final>>", final_retArray_messages)
 
             let retArray_users = JSON.parse(retString_users)
 
-            show_on_screen(final_retArray_messages, retArray_users)
+            show_on_screen(all_new_LS_messages_array, retArray_users)
         }
         catch (err) {
             console.log(err)

@@ -74,7 +74,7 @@ h2{
                 <button type="submit" class="btn btn-success">Create new group</button>
             </div>
             <br>
-            <a href="group-chat.html">Go Back</a> to chat page
+            <!-- <a href="group-chat.html">Go Back</a> to chat page -->
             <br> <br>
           </form>
     </div>
@@ -103,6 +103,12 @@ h2{
                // let new_group = await axios.post("http://localhost:8000/newgroup", groupObj)
                 let new_group = await axios.post("http://localhost:8000/newgroup", groupObj,{ headers: { "Authorisation": token } })
                 console.log(new_group)
+                if(new_group.status == 200){
+                    window.location.href = "http://localhost:8000/user/chat"
+                }
+                else{
+                    document.body.innerHTML = document.body.innerHTML + `<div style="color:red">UNABLE TO CREATE GROUP</div>`
+                }
             }
             catch(err){
                 console.log(err)
