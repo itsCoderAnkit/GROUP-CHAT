@@ -5,9 +5,9 @@ exports.authenticate = async (req,res,next) =>{
 try{
 const token = req.header("Authorisation")
 
-console.log('MIDDLEWARE TOKEN >>>>>>>>>>>>',token)
+//console.log('MIDDLEWARE TOKEN >>>>>>>>>>>>',token)
 const user = jwt.verify(token,'secretkey')
-console.log('MIDDLEWARE USER >>>>>>>>>>>>>>>',user)
+//console.log('MIDDLEWARE USER >>>>>>>>>>>>>>>',user)
 User.findByPk(user.userId).then(user =>{
     //console.log(user)
     req.user = user

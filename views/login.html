@@ -33,52 +33,74 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         <div>
-            <a href="http://localhost:8000/user/signup" title="GO TO SIGN UP PAGE"> DON'T HAVE ACCOUNT? SIGN UP NOW</a> <br>
+            <a href="http://localhost:8000/user/signup" title="GO TO SIGN UP PAGE"> DON'T HAVE ACCOUNT? SIGN UP NOW</a>
+            <br>
             <!-- <a href="http://localhost:8000/password/forgotpassword" title="FORGOT PASSWORD"> FORGOT PASSWORD?</a> -->
         </div>
 
     </div>
 
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.2/socket.io.js"></script>.
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+
+    <script>
+
+        //const socket = io()
+
+        // const socket = io('http://localhost:3000')
+        //         socket.on('login', (loginUser)=> {
+        //             console.log("login in group chat")
+        //         })
+
+        const form = document.getElementById("loginform")
+        const login_email = document.getElementById("loginemail")
+        const login_password = document.getElementById("loginpassword")
+
+        form.addEventListener("submit", user_login)
+
+        async function user_login(e) {
+            try {
+                e.preventDefault()
+                let login_obj = {
+                    email: login_email.value,
+                    password: login_password.value
+                }
+
+                console.log(login_obj)
+                let login_user = await axios.post("http://localhost:8000/user/login", login_obj)
+
+                console.log("login user data", login_user.data.existinguser.name)
+                const loginUser = login_user.data.existinguser.name
+                localStorage.setItem('token', login_user.data.token)
+
+                const socket = io('http://localhost:3000')
+                socket.on('connect', () => {
+                    console.log("logged in")
+                })
+
+                socket.emit('login', loginUser)
+
+
+
+                if (login_user.status == 200) {
+                    window.location.href = "http://localhost:8000/user/chat"
+                }
+                else {
+                    throw new Error("FAILED TO LOGIN")
+
+                }
+            }
+            catch (err) {
+                console.log("USER LOGIN FAILED")
+                document.body.innerHTML = document.body.innerHTML + `<div style="color:red">${err}</div>`
+                document.body.innerHTML = document.body.innerHTML + `<div style="color:red">PLEASE CHECK UR CREDENTIALS</div>`
+            }
+
+        }
+
+    </script>
 </body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
-        
-<script >
-    const form = document.getElementById("loginform")
-    const login_email = document.getElementById("loginemail")
-    const login_password = document.getElementById("loginpassword")
-
-    form.addEventListener("submit", user_login)
-
-    async function user_login(e) {
-        try {
-            e.preventDefault()
-            let login_obj = {
-                email: login_email.value,
-                password: login_password.value
-            }
-
-            console.log(login_obj)
-            let login_user = await axios.post("http://localhost:8000/user/login", login_obj)
-            
-            console.log("login user data",login_user.data)
-            localStorage.setItem('token',login_user.data.token)
-            
-            if (login_user.status == 200) {
-                window.location.href = "http://localhost:8000/user/chat"
-            }
-            else {
-                throw new Error("FAILED TO LOGIN")
-
-            }
-        }
-        catch (err) {
-            console.log("USER LOGIN FAILED")
-            document.body.innerHTML = document.body.innerHTML + `<div style="color:red">${err}</div>`
-            document.body.innerHTML = document.body.innerHTML + `<div style="color:red">PLEASE CHECK UR CREDENTIALS</div>`
-        }
-
-    }
-
-</script>
 
 </html>

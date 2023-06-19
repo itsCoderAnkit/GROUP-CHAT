@@ -19,7 +19,7 @@ exports.user_chat = async (req, res, next) => {
 exports.user_getchats = async(req,res,next)=>{
     try{
         const activeusers = await Users.findAll({where:{isactive:true}})
-        console.log("active users>>>>.",activeusers)
+        //console.log("active users>>>>.",activeusers)
         res.status(201).json({ activeusers: activeusers })
     }
     catch (err) {
@@ -31,15 +31,15 @@ exports.user_getchats = async(req,res,next)=>{
 exports.save_chat = async(req,res,next) =>{
     try{
         console.log(req.body.newmessage)
-        console.log(req.user.id)
+        console.log(req.user)
         
         const user_messages = await Message.create({
             message: req.body.newmessage,
             
             userId: req.user.id
         })
-        console.log("user_messaages>>",user_messages)
-        res.status(201).json({ user_messages: user_messages })
+        //console.log("user_messaages>>",user_messages)
+        res.status(201).json({ user_messages: user_messages ,user_name:req.user.name})
     }
     catch (err){
         console.log(err)
@@ -53,15 +53,15 @@ exports.save_group_chat = async(req,res,next) =>{
         console.log(req.user.id)
         
         groupId= req.params.groupId
-        console.log("groupId>>",req.params.groupId)
+        //console.log("groupId>>",req.params.groupId)
         const user_group_messages = await Message.create({
             message: req.body.newmessage,
             
             userId: req.user.id,
             groupId:groupId
         })
-        console.log("user_group_messaages>>",user_group_messages)
-        res.status(201).json({ user_messages: user_group_messages })
+        //console.log("user_group_messaages>>",user_group_messages)
+        res.status(201).json({ user_messages: user_group_messages,user_name:req.user.name })
     }
     catch (err){
         console.log(err)
@@ -98,5 +98,15 @@ exports.get_all_chats = async (req,res,next)=>{
     catch(err){
         console.log(err)
         console.log("UNABLE TO LOAD ALL MESSAGES")
+    }
+}
+
+exports.upload_image= async (req,res,next) =>{
+    try{
+        console.log("req>>.",req)
+        console.log("req.file>>.",req.file)
+    }
+    catch(err){
+        console.log(err)
     }
 }

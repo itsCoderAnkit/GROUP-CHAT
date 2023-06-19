@@ -3,6 +3,7 @@ const router = express.Router()
 const chatController = require('../controllers/chatControllers')
 const userauthentication = require('../middleware/auth')
 
+
 router.get('/user/chat',chatController.user_chat)
 
 router.get('/user/getchats',chatController.user_getchats)
@@ -13,5 +14,6 @@ router.post('/user/savegroupchat/:groupId', userauthentication.authenticate ,cha
 
 router.get('/user/showchat/:last_msg_id',userauthentication.authenticate,chatController.get_all_chats)
 
+router.post('/user/saveimage',userauthentication.authenticate,chatController.upload_image)
 
 module.exports = router

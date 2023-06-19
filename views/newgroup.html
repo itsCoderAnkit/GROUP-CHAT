@@ -80,10 +80,13 @@ h2{
     </div>
 
           </body>
+          <!-- <script src="http://localhost:8000/socket.io/socket.io.js"></script> -->
+          <!-- <script src="socket.io/socket.io.js"></script> -->
           <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
     
     <script >
 
+const socket = io()
         newGroupForm = document.getElementById('form-submit')
 
         newGroupForm.addEventListener('submit',newGroupDetails)

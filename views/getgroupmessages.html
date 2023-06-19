@@ -122,9 +122,13 @@
       Out</button>
   </div>
 </body>
+<!-- <script src="http://localhost:8000/socket.io/socket.io.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.2/socket.io.js"></script>.
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 <script>
 
+const socket = io('http://localhost:3000')
+    
   all_messages = document.getElementById('file-container')
   message_form = document.getElementById('sendmessage')
   message = document.getElementById('text')
@@ -140,7 +144,15 @@
       console.log("groupIIIIDDDD >>.>>> ", groupId)
       let get_group_message = await axios.get(`http://localhost:8000/getgroupchat/${groupId}`, { headers: { "Authorisation": token } },)
       console.log("get_group_messages>>", get_group_message.data.groupMessages, get_group_message.data.groupMembers)
-      show_group_messages_screen(get_group_message.data.groupMessages, get_group_message.data.groupMembers)
+
+      socket.emit('message', get_group_message.data.groupMessages, get_group_message.data.groupMembers)
+
+            socket.on('print-message', (all_new_LS_messages_array, retArray_users) => {
+                console.log("printing>>>",all_new_LS_messages_array,retArray_users)
+                show_group_messages_screen(all_new_LS_messages_array, retArray_users)
+            })
+
+      
     }
     catch (err) {
       console.log(err)
@@ -175,6 +187,27 @@
     }
   }
 
+  async function show_new_on_screen(res_msg, res_user) {
+
+try {
+    //document.getElementById("chat").innerHTML = ''
+    console.log("res>>>>", res_msg, res_user)
+    
+        const parent_node_expense1 = document.getElementById("chat")
+        
+            
+        
+        const childhtml = `<li id=${res_msg.id}> ${res_user} -> ${res_msg.message} </li>`
+        parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
+    
+
+}
+catch (err) {
+    console.log(err)
+    console.log("UNABLE TO PRINT ON SCREEN")
+}
+}
+
   message_form.addEventListener('submit', save_message)
 
   async function save_message(e) {
@@ -188,7 +221,15 @@
       }
 
       let save_message = await axios.post(`http://localhost:8000/user/savegroupchat/${groupId}`, messageobj, { headers: { "Authorisation": token } },)
-      console.log("save_messages>>", save_message)
+      console.log("save_messages>>", save_message.data.user_messages,save_message.data.user_name)
+
+      socket.emit('new-message', save_message.data.user_messages, save_message.data.user_name)
+
+            socket.on('print-new-message', (all_new_LS_messages_array, retArray_users) => {
+                console.log("printing new msg>>>",all_new_LS_messages_array, retArray_users)
+                show_new_on_screen(all_new_LS_messages_array, retArray_users)
+            })
+
       message.value = ""
     }
     catch (err) {

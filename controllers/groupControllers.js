@@ -20,7 +20,7 @@ exports.get_new_group = async (req, res, next) => {
 exports.post_new_group = async (req, res, next) => {
     try {
         console.log(req.body)
-        console.log("user>>",req.user.name)
+        //console.log("user>>",req.user.name)
         const groupDetails = await Group.create({
             adminname:req.user.name,
             groupname: req.body.groupName,
@@ -45,16 +45,16 @@ exports.post_new_group = async (req, res, next) => {
 exports.get_all_groups = async (req, res, next) => {
     try {
         const groupId = await UserGroup.findAll({ where: { userId: req.user.id } })
-        console.log("groupId>>", groupId.length)
+        //console.log("groupId>>", groupId.length)
         let all_group_array = []
         for (let i = 0; i < groupId.length; i++) {
-            console.log(i, ">>>", groupId[i].dataValues.groupId)
+            //console.log(i, ">>>", groupId[i].dataValues.groupId)
             const groups = await Group.findAll({ where: { id: groupId[i].dataValues.groupId } })
-            console.log("groupId", groups[0].dataValues)
+           // console.log("groupId", groups[0].dataValues)
             all_group_array.push(groups[0].dataValues)
         }
 
-        console.log("all group arrays", all_group_array)
+        //console.log("all group arrays", all_group_array)
 
         // const groups = await Group.findAll({ where: { id: groupId.groupId } })
         // console.log("groupId",groups)
@@ -70,7 +70,7 @@ exports.join_group = async (req, res, next) => {
     try {
         groupId = req.params.groupId
         userId = req.user.id
-        console.log("join group", groupId, userId)
+        //console.log("join group", groupId, userId)
 
         const already_groups_member = await UserGroup.findAll({
             where: {
@@ -79,7 +79,7 @@ exports.join_group = async (req, res, next) => {
             }
         })
 
-        console.log(already_groups_member)
+        //console.log(already_groups_member)
 
         if (already_groups_member.length>0) {
             console.log("already a group member")
