@@ -110,3 +110,37 @@ exports.remove_user = async (req,res,next ) =>{
         console.log("admin not chganged bcknd")
     }
 }
+
+exports.get_all_users = async (req,res,next) =>{
+    try{
+        console.log("aagaya")
+        const relevantUsers = await Users.findAll()
+            console.log("relevant users>>",relevantUsers)
+            return res.status(200).json({ users:relevantUsers })
+
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
+exports.add_member = async (req,res,next) =>{
+    try{
+        console.log("aaggaya aga")
+
+        new_member_exists = await UserGroup.findOne({where:{userId:req.params.userId,groupId:req.params.groupId}})
+        console.log(new_member_exists)
+        
+        if(new_member_exists){
+            return res.status(200).json({ usersexist:true })
+        }
+        else{
+            const new_MEMBER = await UserGroup.create({userId:req.params.userId,groupId:req.params.groupId})
+        console.log(new_MEMBER)
+        return res.status(200).json({ usersexist:false })
+        }
+    }
+    catch(err){
+        console.log(err)
+    }
+}

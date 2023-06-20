@@ -85,7 +85,7 @@ exports.get_all_chats = async (req,res,next)=>{
             
         // }
          //const all_messages = await Message.findAll()
-         const all_messages = await Message.findAll({ where: { id: { [Op.gt]: req.params.last_msg_id }} });
+         const all_messages = await Message.findAll({ where: {groupId:null } });
          
          const all_users = await Users.findAll()
         
@@ -101,12 +101,4 @@ exports.get_all_chats = async (req,res,next)=>{
     }
 }
 
-exports.upload_image= async (req,res,next) =>{
-    try{
-        console.log("req>>.",req)
-        console.log("req.file>>.",req.file)
-    }
-    catch(err){
-        console.log(err)
-    }
-}
+

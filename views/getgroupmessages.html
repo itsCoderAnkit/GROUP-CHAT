@@ -67,7 +67,7 @@
       <br> <br>
 
       <div class="row" style="padding-left: 16%; padding-right: 16%;">
-        <button class="btn btn-secondary btn-sm" id="file-container">Click to see all Shared Files</button>
+        <button class="btn btn-secondary btn-sm" id="file-container">Click to see all Group Messages</button>
       </div>
       <br>
 
@@ -94,6 +94,13 @@
       </form>
     </div>
 
+    <div class="new-image">
+      <form enctype="multipart/form-data" id="imageform">
+          <input type="file" id="myfile" name="myfile">
+          <button class="btn btn-primary btn-sm">Upload</button>
+      </form>
+  </div>
+
     <div class="right-column">
       <h3> Group Link</h3>
       <br>
@@ -113,13 +120,26 @@
           <h2> All Members</h2>
           <div id="new-admin"></div>
           <div id="real-members"></div>
-          
+
+        </div>
+      </div>
+      <div class="row" style="padding-left: 16%; padding-right: 16%;">
+        <button class="btn btn-secondary btn-sm" id="all-users">Click to see All Users</button>
+
+        <div id="all-users-down" style="visibility:hidden ;">
+          <h2> All Users</h2>
+          <div id="new-user"></div>
+          <div id="real-users"></div>
+
         </div>
       </div>
     </div>
 
-    <button class="btn btn-danger" onclick="signOut()" style="position: fixed; bottom: 15px; right: 15px;">Log
-      Out</button>
+
+  </div>
+
+  <button class="btn btn-danger" onclick="signOut()" style="position: fixed; bottom: 15px; right: 15px;">Log
+    Out</button>
   </div>
 </body>
 <!-- <script src="http://localhost:8000/socket.io/socket.io.js"></script> -->
@@ -127,13 +147,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
 <script>
 
-const socket = io('http://localhost:3000')
-    
+  const socket = io('http://localhost:3000')
+
   all_messages = document.getElementById('file-container')
   message_form = document.getElementById('sendmessage')
   message = document.getElementById('text')
   group_link_button = document.getElementById("group-link")
   all_members_button = document.getElementById("all-members")
+  all_users_button = document.getElementById("all-users")
 
   all_messages.addEventListener('click', load_group_messages)
 
@@ -147,12 +168,12 @@ const socket = io('http://localhost:3000')
 
       socket.emit('message', get_group_message.data.groupMessages, get_group_message.data.groupMembers)
 
-            socket.on('print-message', (all_new_LS_messages_array, retArray_users) => {
-                console.log("printing>>>",all_new_LS_messages_array,retArray_users)
-                show_group_messages_screen(all_new_LS_messages_array, retArray_users)
-            })
+      socket.on('print-message', (all_new_LS_messages_array, retArray_users) => {
+        console.log("printing>>>", all_new_LS_messages_array, retArray_users)
+        show_group_messages_screen(all_new_LS_messages_array, retArray_users)
+      })
 
-      
+
     }
     catch (err) {
       console.log(err)
@@ -187,26 +208,28 @@ const socket = io('http://localhost:3000')
     }
   }
 
+
+
   async function show_new_on_screen(res_msg, res_user) {
 
-try {
-    //document.getElementById("chat").innerHTML = ''
-    console.log("res>>>>", res_msg, res_user)
-    
-        const parent_node_expense1 = document.getElementById("chat")
-        
-            
-        
-        const childhtml = `<li id=${res_msg.id}> ${res_user} -> ${res_msg.message} </li>`
-        parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
-    
+    try {
+      //document.getElementById("chat").innerHTML = ''
+      console.log("res>>>>", res_msg, res_user)
 
-}
-catch (err) {
-    console.log(err)
-    console.log("UNABLE TO PRINT ON SCREEN")
-}
-}
+      const parent_node_expense1 = document.getElementById("chat")
+
+
+
+      const childhtml = `<li id=${res_msg.id}> ${res_user} -> ${res_msg.message} </li>`
+      parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
+
+
+    }
+    catch (err) {
+      console.log(err)
+      console.log("UNABLE TO PRINT ON SCREEN")
+    }
+  }
 
   message_form.addEventListener('submit', save_message)
 
@@ -221,14 +244,14 @@ catch (err) {
       }
 
       let save_message = await axios.post(`http://localhost:8000/user/savegroupchat/${groupId}`, messageobj, { headers: { "Authorisation": token } },)
-      console.log("save_messages>>", save_message.data.user_messages,save_message.data.user_name)
+      console.log("save_messages>>", save_message.data.user_messages, save_message.data.user_name)
 
       socket.emit('new-message', save_message.data.user_messages, save_message.data.user_name)
 
-            socket.on('print-new-message', (all_new_LS_messages_array, retArray_users) => {
-                console.log("printing new msg>>>",all_new_LS_messages_array, retArray_users)
-                show_new_on_screen(all_new_LS_messages_array, retArray_users)
-            })
+      socket.on('print-new-message', (all_new_LS_messages_array, retArray_users) => {
+        console.log("printing new msg>>>", all_new_LS_messages_array, retArray_users)
+        show_new_on_screen(all_new_LS_messages_array, retArray_users)
+      })
 
       message.value = ""
     }
@@ -268,6 +291,48 @@ catch (err) {
     console.log("group members", get_group_members.data)
 
     show_group_members_screen(get_group_members.data.groupMembers, get_group_members.data.isAdmin)
+  }
+
+  all_users_button.addEventListener('click', getusers)
+
+
+  async function getusers() {
+    groupId = localStorage.getItem('groupId')
+    const token = localStorage.getItem('token')
+    console.log("users", token)
+    let get_all_users = await axios.get(`http://localhost:8000/getallusers/${groupId}`, { headers: { "Authorisation": token } },)
+
+    console.log("all users", get_all_users.data)
+
+    show_all_users_screen(get_all_users.data.users)
+  }
+
+
+  async function show_all_users_screen(res_user) {
+
+    try {
+      document.getElementById("real-users").innerHTML = ''
+      console.log("res>>>>", res_user)
+      for (let i = 0; i < res_user.length; i++) {
+
+
+        const parent_node_expense1 = document.getElementById("real-users")
+
+        const childhtml = `<li id=${res_user[i].id}>  ${res_user[i].name} 
+  <button onclick=addUser('${res_user[i].id}')> ADD USER </button></li>`
+
+        parent_node_expense1.innerHTML = parent_node_expense1.innerHTML + childhtml;
+
+
+      }
+      document.getElementById('all-users-down').style.visibility = "visible"
+      document.getElementById('all-users').style.visibility = "hidden"
+
+    }
+    catch (err) {
+      console.log(err)
+      console.log("UNABLE TO PRINT ON SCREEN")
+    }
   }
 
 
@@ -340,10 +405,91 @@ catch (err) {
       console.log(err)
       console.log("not changed admin frntnd")
     }
-
-
-
   }
+
+  async function addUser(userId) {
+
+    try {
+      console.log("userId")
+
+      groupId = localStorage.getItem('groupId')
+      const token = localStorage.getItem('token')
+      //console.log("new user>>", token)
+
+      let new_user = await axios.post(`http://localhost:8000/newMember/${groupId}/${userId}`, { headers: { "Authorisation": token } })
+      console.log(new_user.data.usersexist)
+      if (new_user.data.usersexist) {
+        document.getElementById('new-user').innerHTML = document.getElementById('new-user').innerHTML + `<div style="color:red">ALREADY GROUP MEMBER! </div>`
+      }
+      else {
+        document.getElementById('new-user').innerHTML = document.getElementById('new-user').innerHTML + `<div style="color:green">CONGRATULATION! NEW USER ADDED TO GROUP </div>`
+      }
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
+
+  image_form = document.getElementById("imageform")
+    image_form.addEventListener('submit', uploadImage)
+
+    async function uploadImage(e) {
+
+        try {
+            e.preventDefault()
+
+            const file = document.getElementById('myfile').files[0]
+             //const file_target = e.target.files[0];
+            console.log('files******>**', file);
+            //console.log('file target', file_target);
+
+            const formData = new FormData()
+            formData.append('myfile', file)
+
+            console.log('formData',formData.get('myfile'))
+
+            console.log("inside frntnd imageform event")
+            const token = localStorage.getItem('token')
+
+
+
+            let save_image = await axios.post("http://localhost:8000/user/saveimage", formData, { headers: { "Authorisation": token,'Content-Type': 'multipart/form-data' } })
+            console.log(save_image.data.fileURL)
+           
+            save_group_image_URL(save_image.data.fileURL) 
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    async function save_group_image_URL(url) {
+    try {
+      
+      const token = localStorage.getItem('token')
+      const groupId = localStorage.getItem('groupId')
+      
+      messageobj = {
+        newmessage:url
+      }
+
+      let save_message = await axios.post(`http://localhost:8000/user/savegroupchat/${groupId}`, messageobj, { headers: { "Authorisation": token } },)
+      console.log("save_messages>>", save_message.data.user_messages, save_message.data.user_name)
+
+      socket.emit('new-message', save_message.data.user_messages, save_message.data.user_name)
+
+      socket.on('print-new-message', (all_new_LS_messages_array, retArray_users) => {
+        console.log("printing new msg>>>", all_new_LS_messages_array, retArray_users)
+        show_new_on_screen(all_new_LS_messages_array, retArray_users)
+      })
+
+    }
+    catch (err) {
+      console.log(err)
+      console.log("UNABLE TO SAVE MESSAGE IN DATABASE")
+    }
+  }
+
 
 </script>
 

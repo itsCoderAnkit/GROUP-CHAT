@@ -23,7 +23,7 @@
             border-radius: 5px;
             width: 40%;
             float: left;
-            box-shadow: 20px 20px rgb(49, 83, 33);
+            /* box-shadow: 20px 20px rgb(49, 83, 33); */
             height: 460px;
 
             border: solid 1px orange
@@ -31,8 +31,16 @@
 
         #sendmessage {
             flex-grow: 2;
-            border: solid 1px orange
+            border: solid 1px rgb(199, 73, 150);
+            float: left;
         }
+
+        .new-image {
+            flex-grow: 2;
+            border: solid 1px rgb(73, 94, 214);
+            float: left;
+        }
+
 
         .right-column {
             background-color: rgb(226, 185, 131);
@@ -44,6 +52,10 @@
             height: 460px;
 
             border: solid 1px orange
+        }
+
+        body {
+            background-color: rgb(209, 183, 37);
         }
     </style>
 </head>
@@ -85,13 +97,22 @@
               <button type="submit" class="btn btn-primary btn-sm" >Upload</button></div>
             </form>
         </div> -->
+        <!-- <div class="new-image">
+            <form enctype="multipart/form-data" id="imageform">
+                <input type="file" id="myfile" name="myfile">
+                <button class="btn btn-primary btn-sm">Upload</button>
+            </form>
+        </div> -->
+
         <div class="new-image">
             <form enctype="multipart/form-data" id="imageform">
-                <input type="file" id="myfile">
+                <input type="file" id="myfile" name="myfile">
                 <button class="btn btn-primary btn-sm">Upload</button>
-        </div>
-        <div class="col-md-8" style="padding-left: 3%; ">
             </form>
+        </div>
+        
+        <div class="col-md-8" style="padding-left: 3%; ">
+            
 
         </div>
 
@@ -149,7 +170,7 @@
     message_form = document.getElementById('sendmessage')
     message = document.getElementById('text')
     join_group = document.getElementById('join-group')
-    image_form = document.getElementById("imageform")
+    //image_form = document.getElementById("imageform")
 
     //show_active_users()
 
@@ -271,6 +292,7 @@
     async function show_all_messages() {
         try {
             //last_msg_id = localStorage.getItem('last_msg_id')
+            
             const token = localStorage.getItem('token')
 
             let show_message_user = await axios.get(`http://localhost:8000/user/showchat/${last_msg_id}`, { headers: { "Authorisation": token } })
@@ -283,7 +305,7 @@
 
             }
 
-            //console.log("new array", all_new_LS_messages_array)
+            console.log("new array", all_new_LS_messages_array)
 
             let retString_messages = localStorage.getItem("messages")
             let retArray_messages = JSON.parse(retString_messages)
@@ -354,6 +376,7 @@
             let show_all_groups = await axios.get(`http://localhost:8000/getallgroups`, { headers: { "Authorisation": token } })
             console.log(show_all_groups.data.AllgroupDetails)
             show_all_groups_on_screen(show_all_groups.data.AllgroupDetails)
+             
         }
         catch (err) {
             console.log(err)
@@ -418,29 +441,64 @@
         }
     }
 
+    image_form = document.getElementById("imageform")
     image_form.addEventListener('submit', uploadImage)
+
     async function uploadImage(e) {
 
         try {
             e.preventDefault()
 
-            const file = e.target;
+            const file = document.getElementById('myfile').files[0]
+             //const file_target = e.target.files[0];
             console.log('files******>**', file);
+            //console.log('file target', file_target);
 
+            const formData = new FormData()
+            formData.append('myfile', file)
 
+            console.log('formData',formData.get('myfile'))
 
             console.log("inside frntnd imageform event")
             const token = localStorage.getItem('token')
 
-            const form = {
-                newform: "its an image form"
-            }
 
-            let save_image = await axios.post("http://localhost:8000/user/saveimage", form, { headers: { "Authorisation": token } })
-            console.log(save_image)
+
+            let save_image = await axios.post("http://localhost:8000/user/saveimage", formData, { headers: { "Authorisation": token,'Content-Type': 'multipart/form-data' } })
+            console.log(save_image.data.fileURL)
+            document.getElementById('myfile').value=" "
+            save_image_URL(save_image.data.fileURL) 
         }
         catch (err) {
             console.log(err)
+        }
+    }
+
+    async function save_image_URL(url) {
+        try {
+            
+            const token = localStorage.getItem('token')
+            
+            messageobj = {
+                newmessage: url
+            }
+            console.log("mesg obj",messageobj)
+
+            let save_message = await axios.post("http://localhost:8000/user/savechat", messageobj, { headers: { "Authorisation": token } })
+            console.log("save_messages>>", save_message.data.user_messages, save_message.data.user_name)
+           
+
+            socket.emit('new-message', save_message.data.user_messages, save_message.data.user_name)
+
+            socket.on('print-new-message', (all_new_LS_messages_array, retArray_users) => {
+                console.log("printing new msg>>>", all_new_LS_messages_array, retArray_users)
+                show_new_on_screen(all_new_LS_messages_array, retArray_users)
+            })
+
+        }
+        catch(err) {
+            console.log(err)
+            console.log("UNABLE TO SAVE MESSAGE IN DATABASE")
         }
     }
 

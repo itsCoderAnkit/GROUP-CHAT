@@ -9,6 +9,10 @@ router.get('/getgroupchat/:groupId',userauthentication.authenticate,groupMessage
 
 router.get('/getgroupmembers/:groupId',userauthentication.authenticate,groupMessages.get_group_members)
 
+router.get('/getallusers/:groupId',userauthentication.authenticate,groupMessages.get_all_users)
+
+router.post('/newMember/:groupId/:userId',groupMessages.add_member)
+
 router.post('/changeAdmin/:groupId/:userId', groupMessages.change_admin)
 
 router.delete('/removeUser/:groupId/:userId', groupMessages.remove_user)

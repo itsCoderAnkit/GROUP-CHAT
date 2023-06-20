@@ -86,7 +86,7 @@ h2{
     
     <script >
 
-const socket = io()
+
         newGroupForm = document.getElementById('form-submit')
 
         newGroupForm.addEventListener('submit',newGroupDetails)
@@ -119,6 +119,45 @@ const socket = io()
             }
 
         }
+
+        image_form = document.getElementById("imageform")
+    image_form.addEventListener('submit', uploadImage)
+
+    // image_form = document.getElementById("myfile")
+    // image_form.addEventListener('input', uploadImage)
+
+
+    async function uploadImage(e) {
+
+        try {
+            e.preventDefault()
+
+            const file = document.getElementById('myfile').files[0]
+             //const file_target = e.target.files[0];
+            console.log('files******>**', file);
+            //console.log('file target', file_target);
+
+            const formData = new FormData()
+            formData.append('myfile', file)
+
+            console.log('formData',formData.get('myfile'))
+
+            console.log("inside frntnd imageform event")
+            const token = localStorage.getItem('token')
+
+
+
+            let save_image = await axios.post("http://localhost:8000/user/saveimage", formData, { headers: { "Authorisation": token,'Content-Type': 'multipart/form-data' } })
+            console.log(save_image.data.fileURL)
+            document.getElementById('myfile').value=" "
+            save_image_URL(save_image.data.fileURL) 
+        }
+        catch (err) {
+            console.log(err)
+        }
+    }
+
+    
 
     </script>
 </html>
