@@ -9,7 +9,7 @@
     integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
   <title>Group Chat App</title>
 
-  <style>
+  <!-- <style>
     h1,
     h2,
     h3 {
@@ -49,7 +49,99 @@
     #memberlist {
       overflow-y: scroll;
     }
-  </style>
+  </style> -->
+
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    h1 {
+        padding-top: 2%;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    #failure {
+        text-align: center;
+        color: rgb(167, 62, 13);
+        font-weight: 700;
+        font-size: 120%;
+        margin-bottom: 20px;
+    }
+
+    .chat-box {
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        margin-bottom: 10px;
+    }
+
+    .row {
+        padding-left: 16%;
+        padding-right: 16%;
+        margin-bottom: 10px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #6c757d;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn:hover {
+        background-color: #5a6268;
+    }
+
+    #filelist,
+    #memberlist {
+        padding-left: 4%;
+        padding-right: 4%;
+    }
+
+    ul#chat {
+        list-style: none;
+        padding: 0;
+    }
+
+    #sendmessage input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .new-image {
+        margin-bottom: 20px;
+    }
+
+    #group-link-down,
+    #all-members-down,
+    #all-users-down {
+        visibility: hidden;
+        margin-bottom: 20px;
+    }
+
+    #group-link-down h2,
+    #all-members-down h2,
+    #all-users-down h2 {
+        margin-bottom: 10px;
+    }
+</style>
 </head>
 
 <body>
@@ -138,8 +230,15 @@
 
   </div>
 
-  <button class="btn btn-danger" onclick="signOut()" style="position: fixed; bottom: 15px; right: 15px;">Log
-    Out</button>
+  <!-- <button class="btn btn-danger" onclick="signOut()" style="position: fixed; bottom: 15px; right: 15px;">Log
+    Out</button> -->
+
+    <div>
+      <button id="logoutId" type="submit" class="btn btn-primary"
+          style="position: fixed; bottom: 15px; right: 15px; ">LOG OUT</button><br><br>
+     
+  </div>
+
   </div>
 </body>
 <!-- <script src="http://localhost:8000/socket.io/socket.io.js"></script> -->
@@ -150,11 +249,13 @@
   const socket = io('http://localhost:3000')
 
   all_messages = document.getElementById('file-container')
+  logoutButton = document.getElementById('logoutId')
   message_form = document.getElementById('sendmessage')
   message = document.getElementById('text')
   group_link_button = document.getElementById("group-link")
   all_members_button = document.getElementById("all-members")
   all_users_button = document.getElementById("all-users")
+  
 
   all_messages.addEventListener('click', load_group_messages)
 
@@ -208,7 +309,27 @@
     }
   }
 
+  logoutButton.onclick = logout
+    async function logout(e) {
+        try {
+            const token = localStorage.getItem('token')
+            console.log('dom token>>>>>>>>', token)
+            console.log("inside logout function")
+            let logout_user = await axios.get("http://localhost:8000/user/logout", { headers: { "Authorisation": token } })
+            console.log(logout_user)
+            if (logout_user.status == 200) {
+                window.location.href = "http://localhost:8000/user/login"
+            }
+            else {
+                throw new Error("FAILED TO LOGOUT")
 
+            }
+        }
+        catch {
+            console.log("UNABLE TO LOGOUT")
+        }
+
+    }
 
   async function show_new_on_screen(res_msg, res_user) {
 

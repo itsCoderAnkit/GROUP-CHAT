@@ -10,7 +10,7 @@
     <title>CHAT APP LOGIN</title>
 </head>
 
-<body>
+<!-- <body>
 
     <div>
         <h1 style="text-align: center"> USER LOGIN </h1>
@@ -38,6 +38,96 @@
             <!-- <a href="http://localhost:8000/password/forgotpassword" title="FORGOT PASSWORD"> FORGOT PASSWORD?</a> -->
         </div>
 
+    </div> -->
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .form-text {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .signup-link {
+            margin-top: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .signup-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>USER LOGIN</h1>
+        <form id="loginform">
+            <div class="mb-3">
+                <label for="loginemail" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="loginemail" value="" name="email" aria-describedby="emailHelp">
+                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            <div class="mb-3">
+                <label for="loginpassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="loginpassword" value="" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <div class="signup-link">
+            <a href="http://localhost:8000/user/signup" title="GO TO SIGN UP PAGE">DON'T HAVE AN ACCOUNT? SIGN UP NOW</a>
+        </div>
     </div>
 
 

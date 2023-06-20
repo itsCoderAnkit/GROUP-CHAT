@@ -4,6 +4,7 @@ const app = express()
 const path = require('path')
 const http = require('http')
 var cors = require('cors')
+const cron = require('node-cron')
 const io = require('socket.io')(3000, {
     cors: {
         origin: ['http://localhost:8000']
@@ -21,6 +22,7 @@ const User = require('./model/user_signup.js')
 const Message = require('./model/message.js')
 const Group = require('./model/groups.js')
 const UserGroup = require('./model/usergroup.js')
+const ArchievedMessage = require('./model/archievedMessage.js')
 
 const dotenv = require('dotenv')
 dotenv.config()
@@ -28,15 +30,15 @@ dotenv.config()
 const multer = require('multer')
 
 const storage = multer.diskStorage({
-    destination:function (req,file,cb){
-        return cb(null,'./uploads')
+    destination: function (req, file, cb) {
+        return cb(null, './uploads')
     },
-    filename: function(req,file,cb){
-        return cb(null,`${Date.now()} - ${file.originalname}`)
+    filename: function (req, file, cb) {
+        return cb(null, `${Date.now()} - ${file.originalname}`)
     }
 })
 
-const upload = multer({storage:storage})
+const upload = multer({ storage: storage })
 //const io = socketio(8080); 
 
 // const server = http.createServer(app);   // create a server instance
@@ -96,7 +98,11 @@ Message.belongsTo(Group)
 User.belongsToMany(Group, { through: UserGroup });
 Group.belongsToMany(User, { through: UserGroup });
 
+User.hasMany(ArchievedMessage);
+ArchievedMessage.belongsTo(User)
 
+Group.hasMany(ArchievedMessage);
+ArchievedMessage.belongsTo(Group)
 
 app.use(express.static('views'));
 
@@ -107,21 +113,27 @@ app.use(groupmessages)
 app.use(upload.single('myfile'), fileupload);
 
 
+cron.schedule('0 0 * * *', async () => {
+    try {
 
-// app.post('/user/saveimage',upload.single("myfile"),(req,res,next) =>{
-//     try{
-//         console.log("req>>",req.file)
-//         //console.log("req.file>>.",req.file)
-//     }
-//     catch(err){
-//         console.log(err)
-//     }
-// })
+        const chats = await Message.findAll();
+        console.log('ALL CHAT>>.', chats);
 
+        for (const chat of chats) {
+            await ArchievedMessage.create({ groupId: chat.groupId, userId: chat.userId, message: chat.message });
+            console.log('CHAT ID', chat.id)
+            await Message.destroy({ where: { id: chat.id } })
+        }
+
+        console.log('CRON IS RUNNING');
+    } catch (err) {
+        console.error(err);
+    }
+})
 
 sequelize
     .sync()
-    //.sync({force:true})
+    //.sync({ force: true })
     .then(result => {
         console.log("IT IS APP.JS RESULT")
         //console.log(result)
