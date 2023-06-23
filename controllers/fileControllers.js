@@ -9,8 +9,8 @@ const fs = require('fs')
 function uploadtoS3(data,filename){
     console.log('data>>',data)
     const BUCKET_NAME='newgroup';
-    const IAM_USER_KEY = 'AKIAUOTCP23TUR2MULED';
-    const IAM_USER_SECRET ='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'
+    const IAM_USER_KEY = '';
+    const IAM_USER_SECRET =''
 
     let S3bucket = new AWS.S3({
         accessKeyId : IAM_USER_KEY,
